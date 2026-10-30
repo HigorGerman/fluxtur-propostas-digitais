@@ -13,6 +13,9 @@ RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
+# Instala a dependência libgssapi exigida pelo Npgsql no Linux
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
+
 ENV ASPNETCORE_URLS=http://+:5008
 EXPOSE 5008
 
