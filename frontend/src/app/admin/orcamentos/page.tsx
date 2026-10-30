@@ -8,12 +8,14 @@ interface Hotel {
   id: string;
   nome: string;
   cidade: string;
+  fotoUrl?: string;
 }
 
 interface Pacote {
   id: string;
   titulo: string;
   destino: string;
+  fotoUrl?: string;
 }
 
 interface Orcamento {
@@ -33,6 +35,9 @@ interface Orcamento {
   pacote?: Pacote;
   tituloCustomizado?: string;
   destinoCustomizado?: string;
+  hotelNomeCustomizado?: string;
+  hotelFotoUrlCustomizada?: string;
+  hotelGaleriaFotos?: string;
 }
 
 export default function AdminOrcamentosPage() {
@@ -228,10 +233,43 @@ export default function AdminOrcamentosPage() {
                         <p className="text-slate-500 text-[11px]">{orc.clienteWhatsapp}</p>
                       </td>
 
-                      {/* PROPOSTA */}
+                      {/* PROPOSTA / VIAGEM COM FOTO RECONHECÍVEL */}
                       <td className="p-4">
-                        <p className="font-bold text-slate-800">{title}</p>
-                        <span className="text-[10px] font-mono text-slate-400">Token: {orc.token}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-slate-200 bg-[#0A1A3C] flex items-center justify-center relative shadow-xs group">
+                            {orc.hotelFotoUrlCustomizada || orc.hotel?.fotoUrl || orc.pacote?.fotoUrl ? (
+                              <img
+                                src={orc.hotelFotoUrlCustomizada || orc.hotel?.fotoUrl || orc.pacote?.fotoUrl}
+                                alt="Acomodação"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <img
+                                src="/logo.png"
+                                alt="Fluxtur"
+                                className="w-8 h-8 object-contain"
+                              />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-800 truncate max-w-xs" title={title}>
+                              {title}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                                Token: {orc.token}
+                              </span>
+                              {orc.destinoCustomizado && (
+                                <span className="text-[10px] font-semibold text-[#0284C7] bg-sky-50 px-1.5 py-0.5 rounded truncate max-w-[140px]">
+                                  📍 {orc.destinoCustomizado}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </td>
 
                       {/* VALOR */}

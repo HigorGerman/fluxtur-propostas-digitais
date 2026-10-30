@@ -33,7 +33,7 @@ public class CloudinaryUploadService : IImageUploadService
 
         if (_cloudinary == null)
         {
-            return "https://images.unsplash.com/photo-1566073771259-6a8506099945";
+            return "/logo.png";
         }
 
         try
@@ -46,11 +46,11 @@ public class CloudinaryUploadService : IImageUploadService
             };
 
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-            return uploadResult.SecureUrl?.ToString() ?? "https://images.unsplash.com/photo-1566073771259-6a8506099945";
+            return uploadResult.SecureUrl?.ToString() ?? "/logo.png";
         }
         catch
         {
-            return "https://images.unsplash.com/photo-1566073771259-6a8506099945";
+            return "/logo.png";
         }
     }
 }

@@ -9,8 +9,10 @@ interface Hotel {
   id: string;
   nome: string;
   cidade: string;
+  endereco?: string;
   estrelas: number;
   fotoUrl?: string;
+  galeriaFotos?: string;
 }
 
 interface Pacote {
@@ -60,21 +62,24 @@ export default function NovoOrcamentoPage() {
   const [hotelId, setHotelId] = useState("");
 
   // Titulo / Destino
-  const [tituloCustomizado, setTituloCustomizado] = useState("Férias em Recife Resort All Inclusive");
-  const [destinoCustomizado, setDestinoCustomizado] = useState("Recife, Pernambuco");
+  const [tituloCustomizado, setTituloCustomizado] = useState("");
+  const [destinoCustomizado, setDestinoCustomizado] = useState("");
 
   // Hospedagem Estruturada
-  const [hotelNomeCustomizado, setHotelNomeCustomizado] = useState("Vila Galé Cabo Resort - All Inclusive");
-  const [hotelFotoUrlCustomizada, setHotelFotoUrlCustomizada] = useState("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80");
+  const [hotelNomeCustomizado, setHotelNomeCustomizado] = useState("");
+  const [hotelEnderecoCustomizado, setHotelEnderecoCustomizado] = useState("");
+  const [hotelFotoUrlCustomizada, setHotelFotoUrlCustomizada] = useState("");
   const [hotelGaleriaFotos, setHotelGaleriaFotos] = useState("");
-  const [checkInData, setCheckInData] = useState("2026-11-21");
-  const [checkInHorario, setCheckInHorario] = useState("15:00");
-  const [checkOutData, setCheckOutData] = useState("2026-11-27");
+  const [salvarNoCatalogo, setSalvarNoCatalogo] = useState(true);
+  const [showHotelDropdown, setShowHotelDropdown] = useState(false);
+  const [checkInData, setCheckInData] = useState("");
+  const [checkInHorario, setCheckInHorario] = useState("14:00");
+  const [checkOutData, setCheckOutData] = useState("");
   const [checkOutHorario, setCheckOutHorario] = useState("12:00");
-  const [quantidadeNoites, setQuantidadeNoites] = useState("6");
-  const [tipoQuarto, setTipoQuarto] = useState("APARTAMENTO FAMILIAR SUPERIOR MASTER");
+  const [quantidadeNoites, setQuantidadeNoites] = useState("");
+  const [tipoQuarto, setTipoQuarto] = useState("");
   const [regimeAlimentacao, setRegimeAlimentacao] = useState("All Inclusive");
-  const [politicaCancelamento, setPoliticaCancelamento] = useState("Cancelamento grátis até 5 de novembro de 2026");
+  const [politicaCancelamento, setPoliticaCancelamento] = useState("");
 
   // VOO DE IDA - LISTA DINÂMICA DE TRECHOS / PARADAS
   const [possuiVooIda, setPossuiVooIda] = useState(true);
@@ -132,7 +137,7 @@ export default function NovoOrcamentoPage() {
 
   // Agente Responsavel
   const [agenteNome, setAgenteNome] = useState("Gabriel Aguiar Cordeiro");
-  const [agenteTelefone, setAgenteTelefone] = useState("(18) 98109-6649");
+  const [agenteTelefone, setAgenteTelefone] = useState("(18) 99804-8355");
   const [agenteEmail, setAgenteEmail] = useState("sp.gabriel@fluxtur.com.br");
 
   const [submitting, setSubmitting] = useState(false);
@@ -281,8 +286,10 @@ export default function NovoOrcamentoPage() {
 
         // Hospedagem
         hotelNomeCustomizado: hotelNomeCustomizado.trim() || undefined,
+        hotelEnderecoCustomizado: hotelEnderecoCustomizado.trim() || undefined,
         hotelFotoUrlCustomizada: hotelFotoUrlCustomizada.trim() || undefined,
         hotelGaleriaFotos: hotelGaleriaFotos.trim() || undefined,
+        salvarNoCatalogo: salvarNoCatalogo,
         checkInData: checkInData || undefined,
         checkInHorario: checkInHorario.trim() || undefined,
         checkOutData: checkOutData || undefined,
@@ -530,27 +537,192 @@ export default function NovoOrcamentoPage() {
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nome do Hotel / Resort</label>
-                <input
-                  type="text"
-                  placeholder="Ex: Vila Galé Cabo Resort - All Inclusive"
-                  value={hotelNomeCustomizado}
-                  onChange={(e) => setHotelNomeCustomizado(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-[#0A1A3C] focus:ring-2 focus:ring-[#38BDF8] outline-none"
-                />
+              <div className="relative">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Nome do Hotel / Resort
+                  </label>
+                  {hoteis.length > 0 && (
+                    <span className="text-[10px] text-[#0284C7] font-semibold flex items-center gap-1">
+                      <span>⚡</span> {hoteis.length} no catálogo
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Digite o nome (busca automática no catálogo)..."
+                    value={hotelNomeCustomizado}
+                    onChange={(e) => {
+                      setHotelNomeCustomizado(e.target.value);
+                      setShowHotelDropdown(true);
+                    }}
+                    onFocus={() => setShowHotelDropdown(true)}
+                    className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-[#0A1A3C] focus:ring-2 focus:ring-[#38BDF8] outline-none"
+                  />
+                  {hotelNomeCustomizado && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHotelNomeCustomizado("");
+                        setHotelFotoUrlCustomizada("");
+                        setHotelGaleriaFotos("");
+                        setHotelId("");
+                      }}
+                      className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                      title="Limpar"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* DROPDOWN AUTOCOMPLETE COM FOTOS */}
+                {showHotelDropdown && hoteis.length > 0 && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-20"
+                      onClick={() => setShowHotelDropdown(false)}
+                    />
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-60 overflow-y-auto z-30 divide-y divide-slate-100">
+                      <div className="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                        <span>Acomodações do Catálogo Rápido</span>
+                        <span>Clique para preencher</span>
+                      </div>
+                      {hoteis
+                        .filter(
+                          (h) =>
+                            !hotelNomeCustomizado.trim() ||
+                            h.nome.toLowerCase().includes(hotelNomeCustomizado.toLowerCase().trim()) ||
+                            h.cidade.toLowerCase().includes(hotelNomeCustomizado.toLowerCase().trim())
+                        )
+                        .map((h) => (
+                          <div
+                            key={h.id}
+                            onClick={() => {
+                              setHotelNomeCustomizado(h.nome);
+                              if (h.endereco) setHotelEnderecoCustomizado(h.endereco);
+                              if (h.fotoUrl) setHotelFotoUrlCustomizada(h.fotoUrl);
+                              if (h.galeriaFotos) setHotelGaleriaFotos(h.galeriaFotos);
+                              if (!destinoCustomizado && h.cidade) setDestinoCustomizado(h.cidade);
+                              setHotelId(h.id);
+                              setShowHotelDropdown(false);
+                            }}
+                            className="p-3 hover:bg-sky-50 transition-colors cursor-pointer flex items-center gap-3 group"
+                          >
+                            <div className="w-12 h-10 rounded-lg overflow-hidden bg-[#0A1A3C] shrink-0 border border-slate-200 flex items-center justify-center">
+                              {h.fotoUrl ? (
+                                <img
+                                  src={h.fotoUrl}
+                                  alt={h.nome}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                />
+                              ) : (
+                                <img
+                                  src="/logo.png"
+                                  alt="Fluxtur"
+                                  className="w-6 h-6 object-contain"
+                                />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-[#0A1A3C] group-hover:text-[#0284C7] truncate">
+                                {h.nome}
+                              </p>
+                              <p className="text-[10px] text-slate-500 truncate flex items-center gap-1">
+                                {h.cidade ? `📍 ${h.cidade}` : "Destino flexível"}
+                                <span className="text-amber-500 font-semibold ml-1">
+                                  {"★".repeat(h.estrelas || 5)}
+                                </span>
+                              </p>
+                            </div>
+                            <span className="text-[10px] font-bold text-[#0284C7] bg-sky-100 px-2 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                              Selecionar
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">URL da Foto Principal</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  URL da Foto Principal (Capa)
+                </label>
                 <input
                   type="url"
-                  placeholder="https://imagens.com/hotel.jpg"
+                  placeholder="Cole o link da foto do hotel..."
                   value={hotelFotoUrlCustomizada}
                   onChange={(e) => setHotelFotoUrlCustomizada(e.target.value)}
                   className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-[#38BDF8] outline-none"
                 />
               </div>
+            </div>
+
+            {/* ENDEREÇO DA ACOMODAÇÃO */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-700">
+                  Endereço / Localização do Hotel
+                </label>
+                <span className="text-[10px] text-slate-500 font-semibold flex items-center gap-1">
+                  <span>📍</span> O cliente poderá explorar pontos turísticos e praias próximas no Google Maps
+                </span>
+              </div>
+              <input
+                type="text"
+                placeholder="Ex: Av. Beira Mar, 1000 - Praia de Muro Alto, Porto de Galinhas - PE"
+                value={hotelEnderecoCustomizado}
+                onChange={(e) => setHotelEnderecoCustomizado(e.target.value)}
+                className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-[#38BDF8] outline-none"
+              />
+            </div>
+
+            {/* PREVIEW VISUAL DA FOTO SELECIONADA OU LOGO FALLBACK */}
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-12 rounded-lg overflow-hidden border border-slate-300 bg-[#0A1A3C] shrink-0 flex items-center justify-center">
+                  {hotelFotoUrlCustomizada ? (
+                    <img
+                      src={hotelFotoUrlCustomizada}
+                      alt="Preview Acomodação"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src="/logo.png"
+                      alt="Fluxtur Logo"
+                      className="w-8 h-8 object-contain"
+                    />
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-[#0A1A3C]">
+                    {hotelFotoUrlCustomizada ? "Foto Principal Ativa" : "Capa Padrão Fluxtur"}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    {hotelFotoUrlCustomizada
+                      ? "A foto acima será exibida na capa da proposta e na miniatura do painel."
+                      : "Sem foto informada: a proposta exibirá a Logo oficial da Fluxtur com visual executivo."}
+                  </p>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 hover:border-[#38BDF8] transition-all shrink-0">
+                <input
+                  type="checkbox"
+                  checked={salvarNoCatalogo}
+                  onChange={(e) => setSalvarNoCatalogo(e.target.checked)}
+                  className="rounded text-[#0284C7] focus:ring-[#38BDF8] h-4 w-4 cursor-pointer"
+                />
+                <span className="text-[11px] font-bold text-slate-700">
+                  Salvar no catálogo rápido
+                </span>
+              </label>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">

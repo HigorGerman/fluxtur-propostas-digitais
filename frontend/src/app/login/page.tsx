@@ -113,7 +113,7 @@ export default function LoginPage() {
               onChange={(e) => setIdentificador(e.target.value)}
               onBlur={() => setIdentificadorTouched(true)}
               disabled={loading}
-              placeholder="admin@gmail.com"
+              placeholder="contato@fluxtur.com.br"
               required
               className="w-full p-3.5 bg-[#070E1B]/80 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#38BDF8] focus:ring-1 focus:ring-[#38BDF8] transition-all"
             />
@@ -175,8 +175,14 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="text-center pt-2 border-t border-white/5">
-          <Link href="/" className="text-xs text-slate-400 hover:text-[#38BDF8] transition-colors font-medium">
+        <div className="flex flex-col items-center gap-2.5 pt-2 border-t border-white/5 text-center">
+          <Link
+            href="/esqueci-senha"
+            className="text-xs text-slate-400 hover:text-[#38BDF8] transition-colors font-medium hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
+          <Link href="/" className="text-xs text-slate-500 hover:text-slate-300 transition-colors font-medium">
             ← Voltar para a Vitrine do Site
           </Link>
         </div>
@@ -184,3 +190,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

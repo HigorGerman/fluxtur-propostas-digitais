@@ -35,6 +35,7 @@ interface OrcamentoFull {
   idadesCriancas?: string;
 
   hotelNomeCustomizado?: string;
+  hotelEnderecoCustomizado?: string;
   hotelFotoUrlCustomizada?: string;
   hotelGaleriaFotos?: string;
   checkInData?: string;
@@ -43,6 +44,8 @@ interface OrcamentoFull {
   checkOutHorario?: string;
   quantidadeNoites?: number;
   tipoQuarto?: string;
+  numeroQuarto?: string;
+  codigoVoucher?: string;
   regimeAlimentacao?: string;
   politicaCancelamento?: string;
 
@@ -85,16 +88,19 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
 
   // Hospedagem
   const [hotelNomeCustomizado, setHotelNomeCustomizado] = useState("");
+  const [hotelEnderecoCustomizado, setHotelEnderecoCustomizado] = useState("");
   const [hotelFotoUrlCustomizada, setHotelFotoUrlCustomizada] = useState("");
   const [hotelGaleriaFotos, setHotelGaleriaFotos] = useState("");
   const [checkInData, setCheckInData] = useState("");
-  const [checkInHorario, setCheckInHorario] = useState("15:00");
+  const [checkInHorario, setCheckInHorario] = useState("14:00");
   const [checkOutData, setCheckOutData] = useState("");
   const [checkOutHorario, setCheckOutHorario] = useState("12:00");
-  const [quantidadeNoites, setQuantidadeNoites] = useState("6");
-  const [tipoQuarto, setTipoQuarto] = useState("APARTAMENTO FAMILIAR SUPERIOR MASTER");
+  const [quantidadeNoites, setQuantidadeNoites] = useState("");
+  const [tipoQuarto, setTipoQuarto] = useState("");
+  const [numeroQuarto, setNumeroQuarto] = useState("");
+  const [codigoVoucher, setCodigoVoucher] = useState("");
   const [regimeAlimentacao, setRegimeAlimentacao] = useState("All Inclusive");
-  const [politicaCancelamento, setPoliticaCancelamento] = useState("Cancelamento grátis até 5 de novembro de 2026");
+  const [politicaCancelamento, setPoliticaCancelamento] = useState("");
 
   // Voos Dinamicos (Trechos)
   const [trechosIda, setTrechosIda] = useState<TrechoVoo[]>([
@@ -146,7 +152,7 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
   const [observacoes, setObservacoes] = useState("");
 
   const [agenteNome, setAgenteNome] = useState("Gabriel Aguiar Cordeiro");
-  const [agenteTelefone, setAgenteTelefone] = useState("(18) 98109-6649");
+  const [agenteTelefone, setAgenteTelefone] = useState("(18) 99804-8355");
   const [agenteEmail, setAgenteEmail] = useState("sp.gabriel@fluxtur.com.br");
 
   const [submitting, setSubmitting] = useState(false);
@@ -169,18 +175,21 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
         setQuantidadeCriancas((orcData.quantidadeCriancas || 3).toString());
         setIdadesCriancas(orcData.idadesCriancas || "1, 2, 6 anos");
 
-        setHotelNomeCustomizado(orcData.hotelNomeCustomizado || "Vila Galé Cabo Resort - All Inclusive");
+        setHotelNomeCustomizado(orcData.hotelNomeCustomizado || "");
+        setHotelEnderecoCustomizado(orcData.hotelEnderecoCustomizado || "");
         setHotelFotoUrlCustomizada(orcData.hotelFotoUrlCustomizada || "");
         setHotelGaleriaFotos(orcData.hotelGaleriaFotos || "");
 
         if (orcData.checkInData) setCheckInData(orcData.checkInData.split("T")[0]);
-        setCheckInHorario(orcData.checkInHorario || "15:00");
+        setCheckInHorario(orcData.checkInHorario || "14:00");
         if (orcData.checkOutData) setCheckOutData(orcData.checkOutData.split("T")[0]);
         setCheckOutHorario(orcData.checkOutHorario || "12:00");
-        setQuantidadeNoites((orcData.quantidadeNoites || 6).toString());
-        setTipoQuarto(orcData.tipoQuarto || "APARTAMENTO FAMILIAR SUPERIOR MASTER");
+        setQuantidadeNoites((orcData.quantidadeNoites || "").toString());
+        setTipoQuarto(orcData.tipoQuarto || "");
+        setNumeroQuarto(orcData.numeroQuarto || "");
+        setCodigoVoucher(orcData.codigoVoucher || "");
         setRegimeAlimentacao(orcData.regimeAlimentacao || "All Inclusive");
-        setPoliticaCancelamento(orcData.politicaCancelamento || "Cancelamento grátis até 5 de novembro de 2026");
+        setPoliticaCancelamento(orcData.politicaCancelamento || "");
 
         // Carregar trechos JSON se existirem
         if (orcData.vooIdaTrechosJson) {
@@ -206,7 +215,7 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
         setObservacoes(orcData.observacoes || "");
 
         setAgenteNome(orcData.agenteNome || "Gabriel Aguiar Cordeiro");
-        setAgenteTelefone(orcData.agenteTelefone || "(18) 98109-6649");
+        setAgenteTelefone(orcData.agenteTelefone || "(18) 99804-8355");
         setAgenteEmail(orcData.agenteEmail || "sp.gabriel@fluxtur.com.br");
       } catch (err: any) {
         setError(err.message || "Erro ao carregar proposta.");
@@ -301,6 +310,7 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
         idadesCriancas: idadesCriancas.trim() || null,
 
         hotelNomeCustomizado: hotelNomeCustomizado.trim() || null,
+        hotelEnderecoCustomizado: hotelEnderecoCustomizado.trim() || null,
         hotelFotoUrlCustomizada: hotelFotoUrlCustomizada.trim() || null,
         hotelGaleriaFotos: hotelGaleriaFotos.trim() || null,
         checkInData: checkInData || null,
@@ -309,6 +319,8 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
         checkOutHorario: checkOutHorario.trim() || null,
         quantidadeNoites: parseInt(quantidadeNoites, 10) || 0,
         tipoQuarto: tipoQuarto.trim() || null,
+        numeroQuarto: numeroQuarto.trim() || null,
+        codigoVoucher: codigoVoucher.trim() || null,
         regimeAlimentacao: regimeAlimentacao.trim() || null,
         politicaCancelamento: politicaCancelamento.trim() || null,
 
@@ -482,6 +494,71 @@ export default function EditarOrcamentoPage({ params }: { params: Promise<{ id: 
                 onChange={(e) => setHotelFotoUrlCustomizada(e.target.value)}
                 className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-none"
               />
+            </div>
+          </div>
+
+          {/* ENDEREÇO DA ACOMODAÇÃO */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-bold text-slate-700">Endereço / Localização do Hotel</label>
+              <span className="text-[10px] text-slate-500 font-semibold">📍 O cliente poderá visualizar pontos turísticos no Google Maps</span>
+            </div>
+            <input
+              type="text"
+              placeholder="Ex: Av. Beira Mar, 1000 - Praia de Muro Alto, Porto de Galinhas - PE"
+              value={hotelEnderecoCustomizado}
+              onChange={(e) => setHotelEnderecoCustomizado(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-none"
+            />
+          </div>
+
+          {/* DADOS DE RESERVA & VOUCHER PÓS-APROVAÇÃO */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200 space-y-3 mt-4">
+            <div className="flex items-center justify-between border-b border-sky-200/60 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🔑</span>
+                <div>
+                  <h3 className="text-xs font-black text-[#0A1A3C] uppercase tracking-wider">
+                    Dados da Reserva Confirmada & Voucher (Pós-Venda)
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Preencha o quarto atribuído e o localizador para o cliente apresentar no check-in.
+                  </p>
+                </div>
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                status === "Aprovado" ? "bg-emerald-100 text-emerald-800 border border-emerald-300" : "bg-amber-100 text-amber-800 border border-amber-300"
+              }`}>
+                {status === "Aprovado" ? "🟢 Proposta Aprovada" : `Status: ${status}`}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Número do Quarto / Acomodação
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Quarto 304 - Bloco Oceano"
+                  value={numeroQuarto}
+                  onChange={(e) => setNumeroQuarto(e.target.value)}
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-bold text-[#0A1A3C] focus:ring-2 focus:ring-[#38BDF8] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Código do Voucher / Localizador da Reserva
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: RES-982143-HTL"
+                  value={codigoVoucher}
+                  onChange={(e) => setCodigoVoucher(e.target.value)}
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-bold font-mono text-[#0A1A3C] focus:ring-2 focus:ring-[#38BDF8] outline-none"
+                />
+              </div>
             </div>
           </div>
         </div>

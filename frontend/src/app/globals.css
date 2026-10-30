@@ -12,30 +12,117 @@
   }
 }
 
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 10.5pt !important;
+    line-height: 1.35 !important;
+    width: 100% !important;
+    min-height: auto !important;
+  }
+
   .no-print {
     display: none !important;
   }
-  body {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    padding-bottom: 0 !important;
+
+  .print-only {
+    display: block !important;
   }
+
+  .print-only.flex,
+  .print-only.print-flex,
+  div.print-only.flex {
+    display: flex !important;
+  }
+
+  .print-only.grid,
+  .print-only.print-grid,
+  div.print-only.grid {
+    display: grid !important;
+  }
+
+  .print-flex {
+    display: flex !important;
+  }
+
+  .print-grid {
+    display: grid !important;
+  }
+
+  /* Evitar quebra de página dentro de cartões e blocos estruturais */
+  section,
+  .print-avoid-break,
+  .print-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    space-y: 1rem !important;
+  }
+
   header {
     position: static !important;
     box-shadow: none !important;
   }
-  main {
+
+  /* Garantir que imagens e bordas mantenham contraste e fidelidade */
+  img {
     max-width: 100% !important;
-    margin-top: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    space-y: 1.5rem !important;
+    height: auto !important;
   }
-  section {
-    box-shadow: none !important;
-    border: 1px solid #e2e8f0 !important;
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
+
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
   }
+}
+
+/* Modo de Pré-visualização do PDF em Tela */
+.force-print-view .no-print {
+  display: none !important;
+}
+
+.force-print-view .print-only {
+  display: block !important;
+}
+
+.force-print-view .print-only.flex,
+.force-print-view div.print-only.flex {
+  display: flex !important;
+}
+
+.force-print-view .print-only.grid,
+.force-print-view div.print-only.grid {
+  display: grid !important;
+}
+
+.force-print-view section,
+.force-print-view .print-card {
+  box-shadow: none !important;
+  border-color: #cbd5e1 !important;
 }

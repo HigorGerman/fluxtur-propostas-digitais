@@ -1,17 +1,32 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, useMemo } from "react";
+import Link from "next/link";
 import { apiRequest } from "@/services/api";
+import {
+  Hotel as HotelIcon,
+  Plus,
+  Search,
+  Trash2,
+  MapPin,
+  Image as ImageIcon,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  Sparkles,
+  Send,
+  Building2,
+  X
+} from "lucide-react";
 
 interface Hotel {
   id: string;
   nome: string;
   cidade: string;
   endereco: string;
-  estrelas: number;
-  telefone: string;
-  emailContato: string;
+  estrelas?: number;
   fotoUrl?: string;
+  galeriaFotos?: string;
 }
 
 export default function AdminHoteisPage() {
@@ -19,19 +34,19 @@ export default function AdminHoteisPage() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Campos do formulário simplificado
   const [nome, setNome] = useState("");
-  const [cidadeQuery, setCidadeQuery] = useState("");
-  const [cidadesSugestoes, setCidadesSugestoes] = useState<string[]>([]);
-  const [isSearchingCities, setIsSearchingCities] = useState(false);
+  const [cidade, setCidade] = useState("");
   const [endereco, setEndereco] = useState("");
-  const [estrelas, setEstrelas] = useState<number>(5);
-  const [telefone, setTelefone] = useState("");
-  const [emailContato, setEmailContato] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
+  const [galeriaFotos, setGaleriaFotos] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fetchHotels = async () => {
     try {
@@ -53,57 +68,29 @@ export default function AdminHoteisPage() {
     fetchHotels().finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (!cidadeQuery || cidadeQuery.length < 2) {
-      setCidadesSugestoes([]);
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!nome.trim()) {
+      setError("Por favor, informe o nome do hotel ou acomodação.");
       return;
     }
 
-    const timer = setTimeout(async () => {
-      setIsSearchingCities(true);
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cidadeQuery)}&addressdetails=1&limit=6`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const suggestions = new Set<string>();
-          data.forEach((item: any) => {
-            const cityName = item.address?.city || item.address?.town || item.address?.village || item.address?.municipality || item.display_name.split(",")[0];
-            const stateName = item.address?.state || item.address?.country;
-            if (cityName) {
-              suggestions.add(stateName ? `${cityName}, ${stateName}` : cityName);
-            }
-          });
-          setCidadesSugestoes(Array.from(suggestions));
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsSearchingCities(false);
-      }
-    }, 350);
-
-    return () => clearTimeout(timer);
-  }, [cidadeQuery]);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
     setSubmitting(true);
     setError(null);
 
-    const numEstrelas = typeof estrelas === "number" ? estrelas : (parseInt(String(estrelas), 10) || 5);
-
     const formData = new FormData();
     formData.append("nome", nome.trim());
-    formData.append("cidade", cidadeQuery.trim());
+    formData.append("cidade", cidade.trim());
     formData.append("endereco", endereco.trim());
-    formData.append("estrelas", numEstrelas.toString());
-    formData.append("telefone", telefone.trim());
-    formData.append("emailContato", emailContato.trim());
+    formData.append("estrelas", "5");
+    formData.append("telefone", "");
+    formData.append("emailContato", "");
 
     if (fotoUrl && fotoUrl.trim() !== "") {
       formData.append("fotoUrl", fotoUrl.trim());
+    }
+    if (galeriaFotos && galeriaFotos.trim() !== "") {
+      formData.append("galeriaFotos", galeriaFotos.trim());
     }
 
     try {
@@ -113,255 +100,336 @@ export default function AdminHoteisPage() {
       });
 
       setNome("");
-      setCidadeQuery("");
+      setCidade("");
       setEndereco("");
-      setEstrelas(5);
-      setTelefone("");
-      setEmailContato("");
       setFotoUrl("");
+      setGaleriaFotos("");
       setShowForm(false);
+      setSuccessMessage("Hotel adicionado com sucesso ao catálogo!");
+      setTimeout(() => setSuccessMessage(null), 4000);
       await fetchHotels();
     } catch (err: any) {
-      setError(err.message || "Erro ao cadastrar hotel.");
+      setError(err.message || "Erro ao cadastrar hotel no catálogo.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleDelete = async (id: string, hotelNome: string) => {
+    if (!window.confirm(`Deseja realmente remover o hotel "${hotelNome}" do catálogo rápido?`)) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      await apiRequest(`/hotels/${id}`, { method: "DELETE" });
+      setHotels((prev) => prev.filter((h) => h.id !== id));
+      setSuccessMessage(`Hotel "${hotelNome}" removido do catálogo.`);
+      setTimeout(() => setSuccessMessage(null), 3500);
+    } catch (err: any) {
+      alert(err.message || "Erro ao remover hotel.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const filteredHotels = useMemo(() => {
+    if (!searchTerm.trim()) return hotels;
+    const term = searchTerm.toLowerCase();
+    return hotels.filter(
+      (h) =>
+        h.nome.toLowerCase().includes(term) ||
+        (h.cidade && h.cidade.toLowerCase().includes(term)) ||
+        (h.endereco && h.endereco.toLowerCase().includes(term))
+    );
+  }, [hotels, searchTerm]);
+
   if (loading) {
-    return <div className="text-center py-12 text-slate-500 font-medium">Carregando hoteis...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-slate-500 font-medium text-sm">
+        Carregando catálogo de hotéis...
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 w-full my-4 pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E5E9F0] pb-6">
+    <div className="max-w-6xl mx-auto space-y-6 pb-12 p-4 sm:p-6 lg:p-8">
+      {/* CABEÇALHO */}
+      <div className="bg-white border border-[#E5E9F0] rounded-xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#111827] mb-1">Hoteis Parceiros</h1>
-          <p className="text-sm text-slate-500">Consulte e gerencie a rede de hoteis credenciados da Fluxtur.</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A1A3C] text-[#5EA8FF] text-xs font-bold tracking-wide mb-2">
+            <Building2 className="w-3.5 h-3.5" />
+            CATÁLOGO RÁPIDO DE HOSPEDAGENS
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A1A3C] tracking-tight">
+            Catálogo de Hotéis
+          </h1>
+          <p className="text-sm text-slate-500 max-w-2xl mt-1">
+            Gerencie os hotéis e pousadas cadastrados para puxar automaticamente ao criar novas propostas.
+          </p>
         </div>
-        {role === "Admin" && (
+
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setShowForm(!showForm)}
-            className="self-start px-5 py-2.5 bg-gradient-to-r from-[#0A1A3C] to-[#3B82F6] hover:opacity-95 text-white font-bold text-sm rounded-lg shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#0A1A3C] hover:bg-[#122A5C] text-white font-bold text-xs rounded-lg shadow-xs transition-all cursor-pointer whitespace-nowrap"
           >
-            {showForm ? "Fechar Formulario" : "+ Cadastrar Novo Hotel"}
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4 text-[#5EA8FF]" />}
+            <span>{showForm ? "Fechar Cadastro" : "+ Novo Hotel"}</span>
           </button>
-        )}
+        </div>
       </div>
 
-      {showForm && role === "Admin" && (
-        <div className="bg-white border border-[#E5E9F0] rounded-xl p-6 md:p-8 shadow-sm space-y-6">
+      {/* NOTIFICAÇÃO DE SUCESSO */}
+      {successMessage && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-2xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {/* CALLOUT EXPLICATIVO DO FLUXO RÁPIDO */}
+      <div className="p-4 bg-blue-50/80 border border-blue-200 rounded-xl flex items-start gap-3">
+        <Sparkles className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
+        <div className="text-xs text-blue-950 leading-relaxed">
+          <strong className="font-bold text-blue-900">Como funciona o catálogo de hotéis:</strong> Você não precisa cadastrar todos os hotéis de antemão! Ao montar uma nova proposta em <strong>"Nova Proposta"</strong>, basta preencher o nome e foto do hotel e manter a opção <strong>"Salvar no catálogo rápido"</strong> marcada. O hotel fica salvo automaticamente para todas as próximas propostas!
+        </div>
+      </div>
+
+      {/* FORMULÁRIO SIMPLIFICADO DE CADASTRO AVULSO */}
+      {showForm && (
+        <div className="bg-white border border-[#E5E9F0] rounded-xl p-6 shadow-sm space-y-5 animate-in fade-in duration-200">
           <div className="flex items-center justify-between border-b border-[#E5E9F0] pb-4">
-            <h2 className="text-xl font-bold text-[#111827] tracking-tight flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-[#3B82F6]"></span>
-              Cadastrar Novo Hotel Parceiro
-            </h2>
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              Credenciamento
+            <div>
+              <h2 className="text-base font-bold text-[#0A1A3C]">
+                Adicionar Hotel ao Catálogo
+              </h2>
+              <p className="text-xs text-slate-500">
+                Preencha apenas as informações reais utilizadas nas propostas digitais.
+              </p>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 text-sky-800">
+              Avulso
             </span>
           </div>
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium text-center">
-              {error}
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Nome do Hotel / Acomodação *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Ex: Grand Hyatt Rio de Janeiro"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A1A3C] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Cidade / Destino
+                </label>
+                <input
+                  type="text"
+                  value={cidade}
+                  onChange={(e) => setCidade(e.target.value)}
+                  placeholder="Ex: Rio de Janeiro, RJ"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A1A3C] transition-all"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">Nome do Hotel</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Endereço Completo (Opcional)
+              </label>
               <input
                 type="text"
-                required
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                placeholder="Ex: Grand Hyatt Rio de Janeiro"
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
-              />
-            </div>
-
-            <div className="relative">
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">Cidade / Localizacao</label>
-              <input
-                type="text"
-                required
-                list="cidades-api-suggestions"
-                value={cidadeQuery}
-                onChange={(e) => setCidadeQuery(e.target.value)}
-                placeholder="Digite a cidade (ex: Balneario Camboriu, Rio de Janeiro)"
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
-              />
-              <datalist id="cidades-api-suggestions">
-                {cidadesSugestoes.map((c, i) => (
-                  <option key={i} value={c} />
-                ))}
-              </datalist>
-              {isSearchingCities && (
-                <span className="absolute right-3 top-9 text-xs text-[#3B82F6] font-bold animate-pulse">
-                  Buscando...
-                </span>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">Endereco Completo</label>
-              <input
-                type="text"
-                required
                 value={endereco}
                 onChange={(e) => setEndereco(e.target.value)}
-                placeholder="Ex: Av. Lucio Costa, 9600 - Barra da Tijuca"
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
+                placeholder="Ex: Av. Lúcio Costa, 9600 - Barra da Tijuca"
+                className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A1A3C] transition-all"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">Classificacao (Estrelas)</label>
-              <select
-                value={estrelas}
-                onChange={(e) => setEstrelas(Number(e.target.value))}
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none cursor-pointer transition-all shadow-xs"
-              >
-                <option value={5} className="text-[#111827]">5 Estrelas Luxo</option>
-                <option value={4} className="text-[#111827]">4 Estrelas Superior</option>
-                <option value={3} className="text-[#111827]">3 Estrelas Conforto</option>
-                <option value={2} className="text-[#111827]">2 Estrelas Padrao</option>
-                <option value={1} className="text-[#111827]">1 Estrela Pousada</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">Telefone de Contato</label>
-              <input
-                type="text"
-                required
-                value={telefone}
-                onChange={(e) => setTelefone(e.target.value)}
-                placeholder="Ex: (21) 3797-1234"
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">E-mail de Contato</label>
-              <input
-                type="email"
-                required
-                value={emailContato}
-                onChange={(e) => setEmailContato(e.target.value)}
-                placeholder="Ex: reservas@hotel.com"
-                className="w-full px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-[#111827] mb-1.5">URL da Foto do Hotel</label>
-              <div className="flex items-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  URL da Foto Principal (Capa)
+                </label>
                 <input
                   type="url"
                   value={fotoUrl}
                   onChange={(e) => setFotoUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/photo-..."
-                  className="flex-1 px-4 py-2.5 bg-white text-[#111827] font-medium text-sm border border-[#E5E9F0] rounded-lg focus:border-[#3B82F6] focus:ring-2 focus:ring-[#3B82F6]/20 outline-none placeholder:text-slate-400 transition-all shadow-xs"
+                  placeholder="https://exemplo.com/foto-hotel.jpg"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A1A3C] transition-all"
                 />
-                {fotoUrl && (
-                  <div className="w-16 h-11 rounded-lg overflow-hidden border border-[#E5E9F0] bg-slate-100 shrink-0">
-                    <img
-                      src={fotoUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
-                    />
-                  </div>
-                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Galeria de Fotos (Links separados por vírgula)
+                </label>
+                <input
+                  type="text"
+                  value={galeriaFotos}
+                  onChange={(e) => setGaleriaFotos(e.target.value)}
+                  placeholder="https://ex.com/foto1.jpg, https://ex.com/foto2.jpg"
+                  className="w-full px-3.5 py-2.5 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A1A3C] transition-all"
+                />
               </div>
             </div>
 
-            <div className="md:col-span-2 flex items-center justify-end gap-4 mt-6 pt-5 border-t border-[#E5E9F0]">
+            {/* PREVIEW DA FOTO */}
+            {fotoUrl && (
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center gap-3">
+                <div className="w-16 h-12 rounded overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+                  <img
+                    src={fotoUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-slate-600">
+                  <p className="font-bold text-slate-800">Preview da Foto de Capa</p>
+                  <p className="text-[11px] text-slate-500">Essa foto será exibida no card do hotel e nas propostas.</p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-5 py-2.5 bg-white border border-[#E5E9F0] hover:bg-slate-50 text-[#0A1A3C] font-semibold text-sm rounded-lg transition-all cursor-pointer whitespace-nowrap shrink-0"
+                className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-50 cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className={`px-5 py-2.5 bg-gradient-to-r from-[#0A1A3C] to-[#3B82F6] hover:opacity-95 text-white font-bold text-sm rounded-lg shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                className="px-5 py-2 bg-[#0A1A3C] hover:bg-[#122A5C] text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
-                {submitting ? "Salvando..." : "Salvar Hotel"}
+                {submitting ? "Salvando..." : "Salvar no Catálogo"}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="bg-white border border-[#E5E9F0] rounded-xl overflow-hidden shadow-sm">
-        <div className="px-6 py-5 border-b border-[#E5E9F0] flex items-center justify-between bg-slate-50/50">
-          <h2 className="text-lg font-bold text-[#111827] tracking-tight">Lista de Hoteis Cadastrados</h2>
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{hotels.length} parceiros</span>
+      {/* BARRA DE PESQUISA DO CATÁLOGO */}
+      <div className="bg-white border border-[#E5E9F0] rounded-xl p-4 shadow-xs flex items-center justify-between gap-4">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar hotel por nome, cidade ou endereço..."
+            className="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-[#E5E9F0] rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-[#0A1A3C]"
+          />
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-[#E5E9F0]">
-                <th className="text-xs font-bold text-slate-500 uppercase tracking-wider px-6 py-3.5">Hotel</th>
-                <th className="text-xs font-bold text-slate-500 uppercase tracking-wider px-6 py-3.5">Cidade</th>
-                <th className="text-xs font-bold text-slate-500 uppercase tracking-wider px-6 py-3.5">Estrelas</th>
-                <th className="text-xs font-bold text-slate-500 uppercase tracking-wider px-6 py-3.5">Contato</th>
-                <th className="text-xs font-bold text-slate-500 uppercase tracking-wider px-6 py-3.5 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {hotels.map((hotel) => (
-                <tr key={hotel.id} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      {hotel.fotoUrl ? (
-                        <img src={hotel.fotoUrl} alt={hotel.nome} className="w-11 h-11 rounded-lg object-cover border border-[#E5E9F0] shrink-0" />
-                      ) : (
-                        <div className="w-11 h-11 rounded-lg bg-slate-100 border border-[#E5E9F0] flex items-center justify-center text-slate-400 text-xs font-bold shrink-0">
-                          H
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-bold text-[#111827] group-hover:text-[#3B82F6] transition-colors text-base">{hotel.nome}</div>
-                        <div className="text-xs text-slate-500 truncate max-w-xs">{hotel.endereco}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-semibold text-slate-700">
-                    <span className="px-3 py-1 rounded-md bg-slate-100 border border-[#E5E9F0] text-[#111827] font-bold">
-                      {hotel.cidade}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-bold text-amber-500">
-                    {hotel.estrelas} ★
-                  </td>
-                  <td className="px-6 py-4 text-xs text-slate-700">
-                    <div className="font-semibold">{hotel.telefone}</div>
-                    <div className="text-slate-500 text-[11px] truncate">{hotel.emailContato}</div>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                      Ativo
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {hotels.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center py-12 text-slate-500 text-sm">
-                    Nenhum hotel credenciado cadastrado ate o momento.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+
+        <div className="text-xs font-bold text-slate-500 shrink-0">
+          Total: <span className="text-[#0A1A3C] font-extrabold">{filteredHotels.length}</span> hotéis
         </div>
       </div>
+
+      {/* GRADE DE CARDS DE HOTÉIS */}
+      {filteredHotels.length === 0 ? (
+        <div className="bg-white border border-[#E5E9F0] rounded-xl p-12 text-center space-y-3">
+          <HotelIcon className="w-10 h-10 text-slate-300 mx-auto" />
+          <h3 className="text-sm font-bold text-slate-800">
+            {searchTerm ? `Nenhum hotel encontrado para "${searchTerm}"` : "Nenhum hotel no catálogo ainda"}
+          </h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            {searchTerm
+              ? "Tente buscar por outro termo ou limpe a pesquisa."
+              : "Cadastre seu primeiro hotel acima ou crie uma nova proposta com 'Salvar no catálogo rápido' ativado."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredHotels.map((hotel) => (
+            <div
+              key={hotel.id}
+              className="bg-white border border-[#E5E9F0] rounded-xl overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col group"
+            >
+              <div className="h-40 w-full relative bg-[#0A1A3C] overflow-hidden">
+                {hotel.fotoUrl ? (
+                  <img
+                    src={hotel.fotoUrl}
+                    alt={hotel.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                    <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain opacity-50 mb-1" />
+                    <span className="text-[11px] font-semibold text-slate-300">Sem foto de capa</span>
+                  </div>
+                )}
+                <div className="absolute top-2.5 right-2.5">
+                  <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-xs text-white text-[10px] font-bold">
+                    {hotel.cidade || "Destino Flexível"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-sm text-[#0A1A3C] line-clamp-1" title={hotel.nome}>
+                    {hotel.nome}
+                  </h3>
+                  {hotel.endereco ? (
+                    <p className="text-xs text-slate-500 flex items-center gap-1 line-clamp-1" title={hotel.endereco}>
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span>{hotel.endereco}</span>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">Endereço não informado</p>
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-[#E5E9F0] flex items-center justify-between gap-2">
+                  <Link
+                    href={`/admin/orcamentos/novo?hotelId=${hotel.id}`}
+                    className="text-[11px] font-bold text-[#0284C7] hover:text-[#0369A1] flex items-center gap-1"
+                  >
+                    <span>Usar em Proposta</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+
+                  <button
+                    onClick={() => handleDelete(hotel.id, hotel.nome)}
+                    disabled={deletingId === hotel.id}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
+                    title="Remover do catálogo"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

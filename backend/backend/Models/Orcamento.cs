@@ -64,6 +64,8 @@ public class Orcamento
     // Hospedagem Estruturada
     [MaxLength(150)]
     public string? HotelNomeCustomizado { get; set; }
+    [MaxLength(250)]
+    public string? HotelEnderecoCustomizado { get; set; }
     [MaxLength(500)]
     public string? HotelFotoUrlCustomizada { get; set; }
     [MaxLength(2000)]
@@ -77,6 +79,10 @@ public class Orcamento
     public int QuantidadeNoites { get; set; }
     [MaxLength(150)]
     public string? TipoQuarto { get; set; }
+    [MaxLength(50)]
+    public string? NumeroQuarto { get; set; }
+    [MaxLength(50)]
+    public string? CodigoVoucher { get; set; }
     [MaxLength(100)]
     public string? RegimeAlimentacao { get; set; }
     [MaxLength(200)]

@@ -15,6 +15,8 @@ interface Orcamento {
   validade: string;
   tituloCustomizado?: string;
   hotelNomeCustomizado?: string;
+  hotelFotoUrlCustomizada?: string;
+  destinoCustomizado?: string;
 }
 
 export default function AdminDashboardPage() {
@@ -125,10 +127,19 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              href="/"
+              className="px-4 py-3 bg-[#122A5C] hover:bg-[#1a3878] text-[#38BDF8] border border-[#38BDF8]/40 text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2 hover:scale-102"
+              title="Retornar à tela inicial do sistema"
+            >
+              <span>🏠</span>
+              <span>Tela Inicial</span>
+            </Link>
+
             <Link
               href="/admin/orcamentos/novo"
-              className="px-6 py-3 bg-[#38BDF8] hover:bg-[#0284c7] text-[#0A1A3C] text-xs font-black rounded-xl shadow-lg transition-all cursor-pointer flex items-center gap-2"
+              className="px-6 py-3 bg-[#38BDF8] hover:bg-[#0284c7] text-[#0A1A3C] text-xs font-black rounded-xl shadow-lg transition-all cursor-pointer flex items-center gap-2 hover:scale-102"
             >
               <span>✨</span>
               Criar Nova Proposta Digital
@@ -248,8 +259,35 @@ export default function AdminDashboardPage() {
                       <div className="text-[11px] text-slate-500">{orc.clienteWhatsapp}</div>
                     </td>
                     <td className="p-4">
-                      <div className="font-semibold text-slate-800">
-                        {orc.tituloCustomizado || orc.hotelNomeCustomizado || "Proposta Personalizada"}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-200 bg-[#0A1A3C] flex items-center justify-center relative shadow-xs">
+                          {orc.hotelFotoUrlCustomizada ? (
+                            <img
+                              src={orc.hotelFotoUrlCustomizada}
+                              alt="Acomodação"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <img
+                              src="/logo.png"
+                              alt="Fluxtur"
+                              className="w-6 h-6 object-contain"
+                            />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-800 truncate max-w-xs">
+                            {orc.tituloCustomizado || orc.hotelNomeCustomizado || "Proposta Personalizada"}
+                          </div>
+                          {orc.destinoCustomizado && (
+                            <div className="text-[10px] text-[#0284C7] font-semibold truncate max-w-[150px]">
+                              📍 {orc.destinoCustomizado}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="p-4 text-slate-600">{formatDate(orc.criadoEm)}</td>
@@ -331,28 +369,28 @@ export default function AdminDashboardPage() {
         </Link>
 
         <Link
-          href="/admin/hoteis"
+          href="/admin/orcamentos/novo"
           className="bg-white border border-[#E5E9F0] hover:border-[#38BDF8] rounded-2xl p-6 transition-all shadow-xs flex flex-col justify-between group cursor-pointer"
         >
           <div>
-            <div className="h-12 w-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0A1A3C] mb-4 group-hover:scale-105 transition-transform">
+            <div className="h-12 w-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#0284C7] mb-4 group-hover:scale-105 transition-transform">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
             </div>
             <h3 className="text-lg font-bold text-[#0A1A3C] mb-1 group-hover:text-[#38BDF8] transition-colors">
-              Gestão de Hotéis
+              Emitir Nova Proposta
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-              Cadastre e gerencie a lista de hotéis parceiros e resorts para inclusão rápida em propostas.
+              Gere uma proposta digital personalizada com voos estruturados, hotel e simulador de parcelamento.
             </p>
           </div>
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700">
-              Rede de Hotéis
+            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-sky-50 text-sky-700">
+              Construtor Rápido
             </span>
             <span className="text-xs font-semibold text-slate-500 group-hover:text-[#38BDF8] transition-colors">
-              Acessar hotéis ➔
+              Criar agora ➔
             </span>
           </div>
         </Link>

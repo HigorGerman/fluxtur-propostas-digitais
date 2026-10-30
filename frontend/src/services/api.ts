@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:5008/api';
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  ? process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '') + '/api'
+  : 'http://localhost:5008/api';
 
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${path}`;

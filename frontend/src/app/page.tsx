@@ -4,10 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
-  const whatsappAgencyNumber = "5511999999999";
-  const whatsappUrl = `https://wa.me/${whatsappAgencyNumber}?text=${encodeURIComponent(
-    "Olá! Acessei a vitrine da Fluxtur e gostaria de solicitar um orçamento personalizado de viagem!"
-  )}`;
+  const whatsappAgencyNumber = "5518998048355";
+  const whatsappBioUrl = "https://api.whatsapp.com/message/4S7WZNCQT5SUH1?autoload=1&app_absent=0&utm_source=ig";
+  const whatsappUrl = whatsappBioUrl;
 
   const destinosDestaque = [
     {

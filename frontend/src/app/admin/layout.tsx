@@ -60,6 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname === "/admin/hoteis") return { parent: "Gestao", title: "Hoteis Credenciados" };
     if (pathname === "/admin/pacotes") return { parent: "Gestao", title: "Pacotes de Viagem" };
     if (pathname.startsWith("/admin/orcamentos")) return { parent: "Cotações", title: "Propostas Digitais Interativas" };
+    if (pathname === "/admin/manual") return { parent: "Central de Ajuda", title: "Manual de Operação Fluxtur" };
     return { parent: "Painel Admin", title: "Administracao" };
   };
 
@@ -146,7 +147,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className="truncate">Dashboard</span>
               </div>
             </Link>
+
+            <Link
+              href="/"
+              className="group flex items-center justify-between px-4 py-3 rounded-lg font-semibold text-sm text-slate-200 hover:text-white hover:bg-[#122A5C]/60 transition-all duration-200 mt-1"
+            >
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className="p-2 rounded-md bg-[#122A5C] text-slate-300 group-hover:text-white transition-all shrink-0">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                </div>
+                <span className="truncate">Tela Inicial (Site)</span>
+              </div>
+              <span className="text-slate-400 text-xs">↗</span>
+            </Link>
           </div>
+
 
           {role === "Admin" && (
             <div>
@@ -155,6 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
 
               <div className="space-y-1.5">
+
                 <Link
                   href="/admin/hoteis"
                   className={`group flex items-center justify-between px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
@@ -173,10 +191,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
-                    <span className="truncate">Hoteis</span>
+                    <span className="truncate">Hotéis</span>
                   </div>
-                  <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-[#122A5C] text-[#5EA8FF] border border-[#5EA8FF]/20">
-                    Rede
+                  <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                    Catálogo
                   </span>
                 </Link>
 
@@ -185,7 +203,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className={`group flex items-center justify-between px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
                     isLinkActive("/admin/pacotes")
                       ? "bg-[#122A5C] text-[#5EA8FF] border-l-4 border-[#5EA8FF] shadow-xs"
-                      : "text-slate-200 hover:text-white hover:bg-[#122A5C]/60"
+                      : "text-slate-200 hover:text-white hover:bg-[#122A5C]/60 opacity-80"
                   }`}
                 >
                   <div className="flex items-center space-x-3 min-w-0">
@@ -198,10 +216,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
                     </div>
-                    <span className="truncate">Pacotes</span>
+                    <span className="truncate">Pacotes Base</span>
                   </div>
-                  <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    Ofertas
+                  <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Em Produção
                   </span>
                 </Link>
 
@@ -239,7 +257,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <Link
               href="/admin/orcamentos/novo"
-              className="group flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold text-sm text-[#5EA8FF] bg-[#122A5C] hover:bg-[#1a3875] border border-[#5EA8FF]/30 transition-all"
+              className="group flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold text-sm text-[#5EA8FF] bg-[#122A5C] hover:bg-[#1a3875] border border-[#5EA8FF]/30 transition-all mb-1.5"
             >
               <div className="p-2 rounded-md bg-[#5EA8FF] text-[#0A1A3C] transition-all shrink-0">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -247,6 +265,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </svg>
               </div>
               <span className="truncate">+ Nova Proposta</span>
+            </Link>
+          </div>
+
+          <div>
+            <div className="px-3 text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-3">
+              Ajuda & Suporte
+            </div>
+            <Link
+              href="/admin/manual"
+              className={`group flex items-center justify-between px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                isLinkActive("/admin/manual")
+                  ? "bg-[#122A5C] text-[#5EA8FF] border-l-4 border-[#5EA8FF] shadow-xs"
+                  : "text-slate-200 hover:text-white hover:bg-[#122A5C]/60"
+              }`}
+            >
+              <div className="flex items-center space-x-3 min-w-0">
+                <div className={`p-2 rounded-md transition-all shrink-0 ${
+                  isLinkActive("/admin/manual")
+                    ? "bg-[#5EA8FF] text-[#0A1A3C]"
+                    : "bg-[#122A5C] text-slate-300 group-hover:text-white"
+                }`}>
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <span className="truncate">Manual do Sistema</span>
+              </div>
+              <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                Guia
+              </span>
             </Link>
           </div>
         </nav>
@@ -294,8 +342,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <div className="flex items-center space-x-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#5EA8FF] hover:text-white bg-[#122A5C] hover:bg-[#1a3878] border border-[#5EA8FF]/40 transition-all cursor-pointer shadow-xs"
+              title="Voltar para a tela inicial do sistema"
+            >
+              <span>🏠</span>
+              <span>Tela Inicial</span>
+            </Link>
+
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
               Sistema Operacional
             </span>

@@ -29,7 +29,7 @@ namespace backend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CriadoEm")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("Lido")
                         .HasColumnType("boolean");
@@ -56,7 +56,7 @@ namespace backend.Migrations
                         .HasColumnType("character varying(14)");
 
                     b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -97,12 +97,10 @@ namespace backend.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("EmailContato")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
                     b.Property<string>("Endereco")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
@@ -114,19 +112,280 @@ namespace backend.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<string>("GaleriaFotos")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
                     b.Property<string>("Telefone")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Hoteis");
+                });
+
+            modelBuilder.Entity("backend.Models.Orcamento", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AgenteEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("AgenteFotoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("AgenteNome")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("AgenteTelefone")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTime?>("CheckInData")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CheckInHorario")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime?>("CheckOutData")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CheckOutHorario")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("CidadesConexao")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ClienteEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("ClienteNome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ClienteWhatsapp")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("CodigoVoucher")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DestinoCustomizado")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("HotelEnderecoCustomizado")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("HotelFotoUrlCustomizada")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("HotelGaleriaFotos")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid?>("HotelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("HotelNomeCustomizado")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("IdadesCriancas")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IncluiSeguro")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IncluiTransfer")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MensagemCliente")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("NumeroQuarto")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ObservacoesPagamento")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ObservacoesVoo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid?>("PacoteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PoliticaCancelamento")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("QuantidadeAdultos")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuantidadeCriancas")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuantidadeNoites")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RegimeAlimentacao")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("TipoQuarto")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("TituloCustomizado")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("Validade")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("ValorProdutos")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValorTaxas")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValorTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("VooIdaCompanhia")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VooIdaConexoes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("VooIdaDataChegada")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("VooIdaDataSaida")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("VooIdaDestino")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VooIdaDuracao")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("VooIdaHorarioChegada")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("VooIdaHorarioSaida")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("VooIdaOrigem")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("VooIdaParadas")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VooIdaTrechosJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("VooVoltaCompanhia")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VooVoltaConexoes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("VooVoltaDataChegada")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("VooVoltaDataSaida")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("VooVoltaDestino")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VooVoltaDuracao")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("VooVoltaHorarioChegada")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("VooVoltaHorarioSaida")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("VooVoltaOrigem")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("VooVoltaParadas")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VooVoltaTrechosJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("PacoteId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("Orcamentos");
                 });
 
             modelBuilder.Entity("backend.Models.Pacote", b =>
@@ -139,6 +398,10 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CidadesConexao")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("DescricaoAtividades")
                         .IsRequired()
@@ -157,6 +420,9 @@ namespace backend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<bool>("EhVooDireto")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("EstadoDestino")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -170,14 +436,24 @@ namespace backend.Migrations
                     b.Property<Guid>("HotelId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ObservacoesVoo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<bool>("PossuiSeguroViagem")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("PossuiTransfer")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("PossuiVoo")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("PrecoBase")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("QuantidadeParadas")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -201,13 +477,13 @@ namespace backend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CriadoEm")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DataExpiracao")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("RevogadoEm")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -235,7 +511,7 @@ namespace backend.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("DataSolicitacao")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("PacoteId")
                         .HasColumnType("uuid");
@@ -264,7 +540,7 @@ namespace backend.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -275,6 +551,12 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("PasswordResetExpiresAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("text");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -293,83 +575,6 @@ namespace backend.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("backend.Models.VooPacote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AeroportoChegada")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("AeroportoConexao")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("AeroportoPartida")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Companhia")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("EhVooDireto")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FusoChegada")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("FusoPartida")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("HorarioChegada")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("HorarioChegadaConexao")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("HorarioPartida")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("HorarioSaidaConexao")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NumeroVoo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<Guid>("PacoteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("QuantidadeParadas")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TituloTrecho")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("UrlDocumento")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PacoteId");
-
-                    b.ToTable("VoosPacote");
-                });
-
             modelBuilder.Entity("backend.Models.Alerta", b =>
                 {
                     b.HasOne("backend.Models.ReservaPacote", "ReservaPacote")
@@ -379,6 +584,23 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("ReservaPacote");
+                });
+
+            modelBuilder.Entity("backend.Models.Orcamento", b =>
+                {
+                    b.HasOne("backend.Models.Hotel", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("backend.Models.Pacote", "Pacote")
+                        .WithMany()
+                        .HasForeignKey("PacoteId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("Pacote");
                 });
 
             modelBuilder.Entity("backend.Models.Pacote", b =>
@@ -428,17 +650,6 @@ namespace backend.Migrations
                     b.Navigation("Pacote");
                 });
 
-            modelBuilder.Entity("backend.Models.VooPacote", b =>
-                {
-                    b.HasOne("backend.Models.Pacote", "Pacote")
-                        .WithMany("Voos")
-                        .HasForeignKey("PacoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pacote");
-                });
-
             modelBuilder.Entity("backend.Models.Cliente", b =>
                 {
                     b.Navigation("RefreshTokens");
@@ -452,8 +663,6 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Pacote", b =>
                 {
                     b.Navigation("Reservas");
-
-                    b.Navigation("Voos");
                 });
 
             modelBuilder.Entity("backend.Models.ReservaPacote", b =>

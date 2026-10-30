@@ -48,6 +48,44 @@ public class HotelsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, hotel);
     }
 
+    [HttpPost("quick")]
+    [Authorize]
+    public async Task<IActionResult> QuickSave([FromBody] QuickHotelSaveDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Nome))
+        {
+            return BadRequest(new { message = "O nome do hotel é obrigatório." });
+        }
+
+        var trimmedNome = dto.Nome.Trim();
+        var existing = await _context.Hoteis.FirstOrDefaultAsync(h => h.Nome.ToLower() == trimmedNome.ToLower());
+
+        if (existing != null)
+        {
+            if (!string.IsNullOrWhiteSpace(dto.FotoUrl)) existing.FotoUrl = dto.FotoUrl.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.GaleriaFotos)) existing.GaleriaFotos = dto.GaleriaFotos.Trim();
+            if (!string.IsNullOrWhiteSpace(dto.Cidade)) existing.Cidade = dto.Cidade.Trim();
+            await _context.SaveChangesAsync();
+            return Ok(existing);
+        }
+
+        var hotel = new Hotel
+        {
+            Nome = trimmedNome,
+            Cidade = dto.Cidade?.Trim() ?? string.Empty,
+            FotoUrl = dto.FotoUrl?.Trim() ?? string.Empty,
+            GaleriaFotos = dto.GaleriaFotos?.Trim(),
+            Estrelas = dto.Estrelas > 0 ? dto.Estrelas : 5,
+            Endereco = string.Empty,
+            Telefone = string.Empty,
+            EmailContato = string.Empty
+        };
+
+        _context.Hoteis.Add(hotel);
+        await _context.SaveChangesAsync();
+        return Ok(hotel);
+    }
+
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] string? cidade, [FromQuery] string? estado)
     {
@@ -78,5 +116,19 @@ public class HotelsController : ControllerBase
             return NotFound(new { message = "Hotel nao encontrado." });
         }
         return Ok(hotel);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var hotel = await _context.Hoteis.FindAsync(id);
+        if (hotel == null)
+        {
+            return NotFound(new { message = "Hotel não encontrado." });
+        }
+
+        _context.Hoteis.Remove(hotel);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Hotel removido com sucesso." });
     }
 }

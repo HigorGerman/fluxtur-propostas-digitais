@@ -18,6 +18,7 @@ public class PassageirosDto
 public class HospedagemDetalhadaDto
 {
     public string? HotelNome { get; set; }
+    public string? HotelEndereco { get; set; }
     public string? FotoUrl { get; set; }
     public string? GaleriaFotos { get; set; }
     public DateTime? CheckInData { get; set; }
@@ -26,6 +27,8 @@ public class HospedagemDetalhadaDto
     public string? CheckOutHorario { get; set; }
     public int QuantidadeNoites { get; set; }
     public string? TipoQuarto { get; set; }
+    public string? NumeroQuarto { get; set; }
+    public string? CodigoVoucher { get; set; }
     public string? RegimeAlimentacao { get; set; }
     public string? PoliticaCancelamento { get; set; }
 }
@@ -101,14 +104,18 @@ public class OrcamentoCreateDto
 
     // Hospedagem Estruturada
     public string? HotelNomeCustomizado { get; set; }
+    public string? HotelEnderecoCustomizado { get; set; }
     public string? HotelFotoUrlCustomizada { get; set; }
     public string? HotelGaleriaFotos { get; set; }
+    public bool SalvarNoCatalogo { get; set; } = true;
     public DateTime? CheckInData { get; set; }
     public string? CheckInHorario { get; set; }
     public DateTime? CheckOutData { get; set; }
     public string? CheckOutHorario { get; set; }
     public int QuantidadeNoites { get; set; }
     public string? TipoQuarto { get; set; }
+    public string? NumeroQuarto { get; set; }
+    public string? CodigoVoucher { get; set; }
     public string? RegimeAlimentacao { get; set; }
     public string? PoliticaCancelamento { get; set; }
 
@@ -185,6 +192,7 @@ public class OrcamentoUpdateDto
 
     // Hospedagem Estruturada
     public string? HotelNomeCustomizado { get; set; }
+    public string? HotelEnderecoCustomizado { get; set; }
     public string? HotelFotoUrlCustomizada { get; set; }
     public string? HotelGaleriaFotos { get; set; }
     public DateTime? CheckInData { get; set; }
@@ -193,6 +201,8 @@ public class OrcamentoUpdateDto
     public string? CheckOutHorario { get; set; }
     public int? QuantidadeNoites { get; set; }
     public string? TipoQuarto { get; set; }
+    public string? NumeroQuarto { get; set; }
+    public string? CodigoVoucher { get; set; }
     public string? RegimeAlimentacao { get; set; }
     public string? PoliticaCancelamento { get; set; }
 
@@ -277,6 +287,7 @@ public class OrcamentoResponseDto
 
     // Hospedagem Estruturada
     public string? HotelNomeCustomizado { get; set; }
+    public string? HotelEnderecoCustomizado { get; set; }
     public string? HotelFotoUrlCustomizada { get; set; }
     public string? HotelGaleriaFotos { get; set; }
     public DateTime? CheckInData { get; set; }
@@ -285,6 +296,8 @@ public class OrcamentoResponseDto
     public string? CheckOutHorario { get; set; }
     public int QuantidadeNoites { get; set; }
     public string? TipoQuarto { get; set; }
+    public string? NumeroQuarto { get; set; }
+    public string? CodigoVoucher { get; set; }
     public string? RegimeAlimentacao { get; set; }
     public string? PoliticaCancelamento { get; set; }
 

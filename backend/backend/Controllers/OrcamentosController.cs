@@ -41,6 +41,46 @@ public class OrcamentosController : ControllerBase
             }
         }
 
+        Guid? resolvedHotelId = dto.HotelId;
+        if (!resolvedHotelId.HasValue && !string.IsNullOrWhiteSpace(dto.HotelNomeCustomizado) && dto.SalvarNoCatalogo)
+        {
+            var trimmedNome = dto.HotelNomeCustomizado.Trim();
+            var existingHotel = await _context.Hoteis.FirstOrDefaultAsync(h => h.Nome.ToLower() == trimmedNome.ToLower());
+            if (existingHotel != null)
+            {
+                resolvedHotelId = existingHotel.Id;
+                if (!string.IsNullOrWhiteSpace(dto.HotelFotoUrlCustomizada) && string.IsNullOrWhiteSpace(existingHotel.FotoUrl))
+                {
+                    existingHotel.FotoUrl = dto.HotelFotoUrlCustomizada.Trim();
+                }
+                if (!string.IsNullOrWhiteSpace(dto.HotelGaleriaFotos) && string.IsNullOrWhiteSpace(existingHotel.GaleriaFotos))
+                {
+                    existingHotel.GaleriaFotos = dto.HotelGaleriaFotos.Trim();
+                }
+                if (!string.IsNullOrWhiteSpace(dto.HotelEnderecoCustomizado) && string.IsNullOrWhiteSpace(existingHotel.Endereco))
+                {
+                    existingHotel.Endereco = dto.HotelEnderecoCustomizado.Trim();
+                }
+            }
+            else
+            {
+                var newHotel = new Hotel
+                {
+                    Nome = trimmedNome,
+                    Cidade = dto.DestinoCustomizado?.Trim() ?? string.Empty,
+                    FotoUrl = dto.HotelFotoUrlCustomizada?.Trim() ?? string.Empty,
+                    GaleriaFotos = dto.HotelGaleriaFotos?.Trim(),
+                    Endereco = dto.HotelEnderecoCustomizado?.Trim() ?? string.Empty,
+                    Estrelas = 5,
+                    Telefone = string.Empty,
+                    EmailContato = string.Empty
+                };
+                _context.Hoteis.Add(newHotel);
+                await _context.SaveChangesAsync();
+                resolvedHotelId = newHotel.Id;
+            }
+        }
+
         var token = GenerateUniqueToken();
 
         var orcamento = new Orcamento
@@ -58,7 +98,7 @@ public class OrcamentosController : ControllerBase
 
             Observacoes = dto.Observacoes,
             CriadoEm = DateTime.UtcNow,
-            HotelId = dto.HotelId,
+            HotelId = resolvedHotelId,
             PacoteId = dto.PacoteId,
             TituloCustomizado = dto.TituloCustomizado,
             DestinoCustomizado = dto.DestinoCustomizado,
@@ -70,6 +110,7 @@ public class OrcamentosController : ControllerBase
 
             // Hospedagem Estruturada
             HotelNomeCustomizado = dto.HotelNomeCustomizado,
+            HotelEnderecoCustomizado = dto.HotelEnderecoCustomizado,
             HotelFotoUrlCustomizada = dto.HotelFotoUrlCustomizada,
             HotelGaleriaFotos = dto.HotelGaleriaFotos,
             CheckInData = EnsureUtc(dto.CheckInData),
@@ -78,6 +119,8 @@ public class OrcamentosController : ControllerBase
             CheckOutHorario = dto.CheckOutHorario,
             QuantidadeNoites = dto.QuantidadeNoites,
             TipoQuarto = dto.TipoQuarto,
+            NumeroQuarto = dto.NumeroQuarto,
+            CodigoVoucher = dto.CodigoVoucher,
             RegimeAlimentacao = dto.RegimeAlimentacao,
             PoliticaCancelamento = dto.PoliticaCancelamento,
 
@@ -224,6 +267,7 @@ public class OrcamentosController : ControllerBase
 
         // Hospedagem
         if (dto.HotelNomeCustomizado != null) orcamento.HotelNomeCustomizado = dto.HotelNomeCustomizado;
+        if (dto.HotelEnderecoCustomizado != null) orcamento.HotelEnderecoCustomizado = dto.HotelEnderecoCustomizado;
         if (dto.HotelFotoUrlCustomizada != null) orcamento.HotelFotoUrlCustomizada = dto.HotelFotoUrlCustomizada;
         if (dto.HotelGaleriaFotos != null) orcamento.HotelGaleriaFotos = dto.HotelGaleriaFotos;
         if (dto.CheckInData.HasValue) orcamento.CheckInData = EnsureUtc(dto.CheckInData);
@@ -232,6 +276,8 @@ public class OrcamentosController : ControllerBase
         if (dto.CheckOutHorario != null) orcamento.CheckOutHorario = dto.CheckOutHorario;
         if (dto.QuantidadeNoites.HasValue) orcamento.QuantidadeNoites = dto.QuantidadeNoites.Value;
         if (dto.TipoQuarto != null) orcamento.TipoQuarto = dto.TipoQuarto;
+        if (dto.NumeroQuarto != null) orcamento.NumeroQuarto = dto.NumeroQuarto;
+        if (dto.CodigoVoucher != null) orcamento.CodigoVoucher = dto.CodigoVoucher;
         if (dto.RegimeAlimentacao != null) orcamento.RegimeAlimentacao = dto.RegimeAlimentacao;
         if (dto.PoliticaCancelamento != null) orcamento.PoliticaCancelamento = dto.PoliticaCancelamento;
 
@@ -426,6 +472,7 @@ public class OrcamentosController : ControllerBase
 
             // Hospedagem
             HotelNomeCustomizado = o.HotelNomeCustomizado,
+            HotelEnderecoCustomizado = o.HotelEnderecoCustomizado ?? o.Hotel?.Endereco ?? o.Pacote?.Hotel?.Endereco,
             HotelFotoUrlCustomizada = o.HotelFotoUrlCustomizada,
             HotelGaleriaFotos = o.HotelGaleriaFotos,
             CheckInData = o.CheckInData,
@@ -434,6 +481,8 @@ public class OrcamentosController : ControllerBase
             CheckOutHorario = o.CheckOutHorario,
             QuantidadeNoites = o.QuantidadeNoites,
             TipoQuarto = o.TipoQuarto,
+            NumeroQuarto = o.NumeroQuarto,
+            CodigoVoucher = o.CodigoVoucher,
             RegimeAlimentacao = o.RegimeAlimentacao,
             PoliticaCancelamento = o.PoliticaCancelamento,
 

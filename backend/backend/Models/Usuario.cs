@@ -25,5 +25,10 @@ public class Usuario
 
     public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
 
+    public string? PasswordResetToken { get; set; }
+
+    public DateTime? PasswordResetExpiresAt { get; set; }
+
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
+

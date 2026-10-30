@@ -11,27 +11,25 @@ public class Hotel
     [MaxLength(150)]
     public string Nome { get; set; } = string.Empty;
 
-    [Required]
     [MaxLength(250)]
-    public string Endereco { get; set; } = string.Empty;
+    public string? Endereco { get; set; }
 
-    [Required]
     [MaxLength(100)]
     public string Cidade { get; set; } = string.Empty;
 
-    public int Estrelas { get; set; }
+    public int Estrelas { get; set; } = 5;
 
     [MaxLength(500)]
     public string FotoUrl { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(20)]
-    public string Telefone { get; set; } = string.Empty;
+    [MaxLength(2000)]
+    public string? GaleriaFotos { get; set; }
 
-    [Required]
-    [EmailAddress]
+    [MaxLength(20)]
+    public string? Telefone { get; set; }
+
     [MaxLength(150)]
-    public string EmailContato { get; set; } = string.Empty;
+    public string? EmailContato { get; set; }
 
     [JsonIgnore]
     public ICollection<Pacote> Pacotes { get; set; } = new List<Pacote>();

@@ -95,7 +95,7 @@ export default function AdminPacotesPage() {
       try {
         const user = JSON.parse(userStr);
         setRole(user.role);
-      } catch {}
+      } catch { }
     }
     fetchPacotes();
     fetchFilteredHotels("").finally(() => setLoading(false));
@@ -232,11 +232,10 @@ export default function AdminPacotesPage() {
         {role === "Admin" && (
           <button
             onClick={() => setShowForm(!showForm)}
-            className={`self-start px-5 py-2.5 font-bold text-sm rounded-lg shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-              showForm
+            className={`self-start px-5 py-2.5 font-bold text-sm rounded-lg shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${showForm
                 ? "bg-white border border-[#E5E9F0] text-[#0A1A3C] hover:bg-slate-50"
                 : "bg-gradient-to-r from-[#0A1A3C] to-[#3B82F6] hover:opacity-95 text-white"
-            }`}
+              }`}
           >
             {showForm ? "Fechar Formulario" : "+ Criar Novo Pacote"}
           </button>
